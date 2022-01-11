@@ -1,6 +1,6 @@
 {
   "name": "@ivorobioff/techmoodivns-support",
-  "version": "2.1.1-test.12",
+  "version": "2.2.1",
   "scripts": {
     "build": "tsc"
   },
