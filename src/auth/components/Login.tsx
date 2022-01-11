@@ -77,7 +77,7 @@ class Login extends Component<LoginProps, LoginState> {
     }
 
     componentDidMount() {
-        let state: LoginLocationState = (this.props.location.state || {});
+        let state = (this.props.location.state || {}) as LoginLocationState;
 
         if (state.flash) {
             this.setState({ flash: state.flash });

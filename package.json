@@ -1,9 +1,11 @@
 {
   "name": "@ivorobioff/techmoodivns-support",
-  "version": "2.1.1",
+  "version": "2.1.1-test.12",
   "scripts": {
-    "build": "npx tsc"
+    "build": "tsc"
   },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/ivorobioff/techmoodivns-web-support.git"
