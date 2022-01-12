@@ -1,12 +1,13 @@
 {
   "name": "@ivorobioff/techmoodivns-support",
-  "version": "2.2.7",
+  "version": "2.2.8",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "release": "npm run build && cp ./package.json ./dist/ && cd ./dist && npm publish && cd ../ && rm -fR ./dist"
   },
-  "files": ["dist"],
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "files": ["src", "index.js", "index.d.ts"],
+  "main": "./index.js",
+  "types": "./index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/ivorobioff/techmoodivns-web-support.git"
