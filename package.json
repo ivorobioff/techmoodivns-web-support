@@ -1,9 +1,10 @@
 {
   "name": "@ivorobioff/techmoodivns-support",
-  "version": "2.2.6",
+  "version": "2.2.7",
   "scripts": {
     "build": "tsc"
   },
+  "files": ["dist"],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "repository": {
