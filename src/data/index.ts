@@ -1,6 +1,6 @@
 export { default as DataActionArea } from "./components/DataActionArea";
 export { default as DataPaper } from "./components/DataPaper";
-export { default as DataView } from "./components/DataView";
+export { default as DataView, DataViewCellFormat } from "./components/DataView";
 export {
 	sorting,
 	textFilter,
