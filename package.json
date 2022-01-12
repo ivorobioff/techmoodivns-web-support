@@ -1,6 +1,6 @@
 {
   "name": "@ivorobioff/techmoodivns-support",
-  "version": "2.2.10",
+  "version": "2.2.11",
   "scripts": {
     "build": "tsc",
     "release": "npm run build && cp ./package.json ./dist/ && cd ./dist && npm publish && cd ../ && rm -fR ./dist"
@@ -47,7 +47,7 @@
     "rxjs": "^6.5.5",
     "serve": "^11.3.0",
     "typeface-roboto": "0.0.75",
-    "typescript": "^3.7.5",
+    "typescript": "4.5.4",
     "uuid": "^8.3.2"
   }
 }
