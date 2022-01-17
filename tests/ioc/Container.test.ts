@@ -56,6 +56,20 @@ test('registers a type, and then checks and retrieves its instance', () => {
     expect(instance1).not.toBe(instance2);
 });
 
+test('register and then override', () => {
+    let container  = new Container();
+
+    var instance1  = new SomeService();
+    var instance2  = new SomeService();
+
+    container.registerType(SomeService);
+    container.registerInstance(SomeService, instance1);
+    container.registerFactory(SomeService, () => instance2);
+
+    expect(container.get(SomeService)).toBe(instance2);
+
+});
+
 class SomeService {
 
 }
