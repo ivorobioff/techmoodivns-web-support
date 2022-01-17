@@ -10,7 +10,15 @@ function alias(reference: InstanceReference<any> | InstanceType<any>): string {
     return (reference as any).name;
 }
 
+class LockedError extends Error {
+    constructor() {
+        super('Container is locked - nothing can be registered!')
+    }
+}
+
 export default class Container {
+    
+    private locked = false;
 
     private instances = new Map<string, any>();
 
@@ -18,6 +26,11 @@ export default class Container {
     private registeredFactories = new Map<string, InstanceFactory<any>>();
 
     registerInstance<T>(reference: InstanceReference<T>, instance: T) {
+
+        if (this.locked) {
+            throw new LockedError();
+        }
+
         this.instances.set(alias(reference), instance);
     }
 
@@ -25,6 +38,11 @@ export default class Container {
     registerType<T>(reference: InstanceType<T>): void;
 
     registerType<T>(reference: string | InstanceType<T>, type?: InstanceType<T>) {
+        
+        if (this.locked) {
+            throw new LockedError();
+        }
+
         if (typeof reference === 'string') {
             this.registeredTypes.set(reference, type as InstanceType<T>);
         } else {
@@ -33,10 +51,17 @@ export default class Container {
     }
 
     registerFactory<T>(reference: InstanceReference<T>, factory: InstanceFactory<T>) {
+
+        if (this.locked) {
+            throw new LockedError();
+        }
+        
         this.registeredFactories.set(alias(reference), factory);
     }
 
     get<T>(reference: InstanceReference<T>): T {
+
+        this.locked = true;
 
         let name = alias(reference);
 
@@ -57,13 +82,14 @@ export default class Container {
             return (this.registeredFactories.get(reference) as InstanceFactory<T>)(this);
         }
 
-        throw new Error(`${reference} is not registered!`);
+        throw new Error(`'${reference}' is not registered!`);
     }
     
     has(reference: InstanceReference<any>): boolean {
         return !![
             this.instances, 
-            this.registeredTypes
+            this.registeredTypes,
+            this.registeredFactories
         ].find(i =>  i.has(alias(reference)));
     }
 }
