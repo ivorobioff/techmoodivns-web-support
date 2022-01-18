@@ -71,10 +71,15 @@ test('container passed when create from type', () => {
     let container = new Container();
 
     container.registerType(SomeService);
+    container.registerType('some', SomeService);
 
-    let instance = container.get(SomeService);
+    let instance1 = container.get(SomeService);
+    let instance2 = container.get('some') as SomeService;
 
-    expect(instance.container).toBe(container);
+    expect(instance1).not.toBe(instance2);
+
+    expect(instance1.container).toBe(container);
+    expect(instance2.container).toBe(container);
 });
 
 test('register and then override', () => {
