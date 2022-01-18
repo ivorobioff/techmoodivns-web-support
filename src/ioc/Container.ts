@@ -10,6 +10,7 @@ function makeAlias(reference: InstanceReference<any> | InstanceType<any>): strin
     return (reference as any).name;
 }
 
+
 class LockedError extends Error {
     constructor() {
         super('Container is locked - nothing can be registered!')
@@ -28,19 +29,17 @@ export default class Container {
 
     private locked = false;
 
-    private resolvedInstances = new Map<string, any>();
+    private instances = new Map<string, any>();
 
-    private registeredInstances = new Map<string, any>();
-    private registeredTypes = new Map<string, InstanceType<any>>();
-    private registeredFactories = new Map<string, InstanceFactory<any>>();
+    private factories = new Map<string, InstanceFactory<any>>();
 
     registerInstance<T>(reference: InstanceReference<T>, instance: T) {
 
         if (this.locked) {
             throw new LockedError();
         }
-        
-        this.registerResolver(makeAlias(reference), instance, this.registeredInstances);
+
+        this.factories.set(makeAlias(reference), () => instance);        
     }
 
     registerType<T>(reference: string, type: InstanceType<T>): void;
@@ -53,9 +52,9 @@ export default class Container {
         }
 
         if (typeof reference === 'string') {
-            this.registerResolver(reference, type, this.registeredTypes);
+            this.factories.set(reference, (c) => new type!(c));
         } else {
-            this.registerResolver(makeAlias(reference), reference, this.registeredTypes);
+            this.factories.set(makeAlias(reference), (c) => new reference(c));
         }
     }
 
@@ -64,8 +63,8 @@ export default class Container {
         if (this.locked) {
             throw new LockedError();
         }
-        
-        this.registerResolver(makeAlias(reference), factory, this.registeredFactories);
+
+        this.factories.set(makeAlias(reference), factory);        
     }
 
     get<T>(reference: InstanceReference<T>): T {
@@ -74,65 +73,32 @@ export default class Container {
 
         let alias = makeAlias(reference);
 
-        if (!this.resolvedInstances.has(alias)) {
-            this.resolvedInstances.set(alias, this.resolveInstance(alias));
-        }
+        if (!this.instances.has(alias)) {
+            
+            let factory = this.factories.get(alias);
 
-        return this.resolvedInstances.get(alias);
-    }
-
-    private resolveInstance<T>(reference: string): T {
-
-        let instance = getAndRemove(reference, this.registeredInstances);
-
-        if (instance !== null && typeof instance !== 'undefined') {
-            return instance;
-        }
-
-        let type = getAndRemove(reference, this.registeredTypes);
-
-        if (type) {
-            return new type(this);
-        }
-
-        let factory = getAndRemove(reference, this.registeredFactories);
-
-        if (factory) {
-            let result = factory(this);
-
-            if (result === null || typeof result === 'undefined') {
-                throw new Error(`'${reference}' not created!`);
+            if (!factory) {
+                throw new Error(`'${alias}' not registered!`);
             }
 
-            return result;
+            let instance = factory(this);
+
+            if (instance === null || typeof instance === 'undefined') {
+                throw new Error(`'${alias}' not created!`);
+            }
+
+            this.instances.set(alias, instance);
+
+            this.factories.delete(alias);
         }
 
-        throw new Error(`'${reference}' not registered!`);
+        return this.instances.get(alias);
     }
 
     has(reference: InstanceReference<any>): boolean {
 
         let alias = makeAlias(reference);
 
-        return !![
-            this.resolvedInstances,
-            this.registeredInstances,
-            this.registeredTypes,
-            this.registeredFactories
-        ].find(i => i.has(alias));
-    }
-    
-    private registerResolver(alias: string, resolver: any, targetResolvers: Map<string, any>) {
-        [
-            this.registeredInstances,
-            this.registeredFactories,
-            this.registeredTypes
-        ].forEach(resolvers => {
-            if (resolvers === targetResolvers) {
-                resolvers.set(alias, resolver);
-            } else {
-                resolvers.delete(alias);
-            }
-        });
+        return this.instances.has(alias) || this.factories.has(alias);
     }
 }
