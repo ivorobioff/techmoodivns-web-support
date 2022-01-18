@@ -67,6 +67,16 @@ test('check if present after retrieving', () => {
     expect(container.has(SomeService)).toBeTruthy();
 });
 
+test('container passed when create from type', () => {
+    let container = new Container();
+
+    container.registerType(SomeService);
+
+    let instance = container.get(SomeService);
+
+    expect(instance.container).toBe(container);
+});
+
 test('register and then override', () => {
     let container = new Container();
 
@@ -109,5 +119,7 @@ test('missing', () => {
 });
 
 class SomeService {
+    constructor(public container?: Container) {
 
+    }
 }
