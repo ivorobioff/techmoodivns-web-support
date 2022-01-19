@@ -6,6 +6,7 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import MainMenu, { MainMenuItem } from './MainMenu';
 import Copyright from './Copyright';
 import UserMenu, { UserMenuItemGroup } from './UserMenu';
+import {CSSProperties} from '@material-ui/styles'
 
 const drawerWidth = 230;
 
@@ -22,14 +23,15 @@ const styles = (theme: Theme) => createStyles({
         justifyContent: 'flex-end',
         padding: '0 8px 0 17px',
         ...theme.mixins.toolbar,
-    },
+    } as CSSProperties,
     appBar: {
         zIndex: theme.zIndex.drawer + 1,
         transition: theme.transitions.create(['width', 'margin'], {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
         }),
-    }, appBarShift: {
+    },
+    appBarShift: {
         marginLeft: drawerWidth,
         width: `calc(100% - ${drawerWidth}px)`,
         transition: theme.transitions.create(['width', 'margin'], {
@@ -113,7 +115,7 @@ class FlameLayout extends Component<FlameLayoutProps, FlameLayoutState> {
             expanded: false
         };
     }
-    
+
     showMenu() {
         this.setState({
             expanded: true
@@ -124,7 +126,7 @@ class FlameLayout extends Component<FlameLayoutProps, FlameLayoutState> {
         this.setState({
             expanded: false
         });
-    }    
+    }
 
     render() {
 
@@ -139,34 +141,34 @@ class FlameLayout extends Component<FlameLayoutProps, FlameLayoutState> {
                         edge="start"
                         color="inherit"
                         aria-label="open drawer"
-                        onClick={ this.showMenu.bind(this) }
+                        onClick={this.showMenu.bind(this)}
                         className={clsx(classes.menuButton, expanded && classes.menuButtonHidden)}>
                         <MenuIcon />
                     </IconButton>
-                    <Typography 
-                        component="h1" 
-                        variant="h6" 
-                        color="inherit" 
+                    <Typography
+                        component="h1"
+                        variant="h6"
+                        color="inherit"
                         noWrap
                         className={classes.title}>
-                        {expanded ?  '' : title}
+                        {expanded ? '' : title}
                     </Typography>
                     <UserMenu title={userMenu.title} items={userMenu.items} />
                 </Toolbar>
             </AppBar>
-            <Drawer 
+            <Drawer
                 variant="permanent"
                 classes={{
                     paper: clsx(classes.drawerPaper, !expanded && classes.drawerPaperClose),
                 }}
                 open={expanded}>
-                    
+
                 <div className={classes.toolbarIcon}>
-                    <Typography 
-                        component="h1" 
-                        variant="h6" 
-                        color="inherit" 
-                        noWrap 
+                    <Typography
+                        component="h1"
+                        variant="h6"
+                        color="inherit"
+                        noWrap
                         className={classes.title}>
                         {title}
                     </Typography>
@@ -180,7 +182,7 @@ class FlameLayout extends Component<FlameLayoutProps, FlameLayoutState> {
             <main className={classes.content}>
                 <div className={classes.appBarSpacer} />
                 <Container className={classes.container}>
-                    { this.props.children }
+                    {this.props.children}
                     <Box pt={4}>
                         <Copyright url={site.url} name={site.name} />
                     </Box>
