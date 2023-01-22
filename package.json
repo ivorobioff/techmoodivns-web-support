@@ -1,10 +1,11 @@
 {
   "name": "@ivorobioff/techmoodivns-support",
-  "version": "2.2.13",
+  "version": "2.3.0",
   "scripts": {
     "build": "tsc",
     "test": "jest",
-    "release": "npm run build && cp ./package.json ./dist/ && cd ./dist && npm publish && cd ../ && rm -fR ./dist"
+    "release-linux": "npm run build && cp ./package.json ./dist/ && cp ./.npmrc ./dist/ && cd ./dist && npm publish && cd ../ && rm -fR ./dist",
+    "release-windows": "npm run build && copy .\\package.json .\\dist && copy .\\.npmrc .\\dist && cd .\\dist && npm publish && cd ..\\ && rd /s /q .\\dist"
   },
   "files": [
     "src",
