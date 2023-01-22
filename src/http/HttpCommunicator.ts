@@ -92,6 +92,31 @@ export default class HttpCommunicator {
         return this.communicate('DELETE', endpoint, query); 
     }
 
+    loadBase64Image(endpoint: string, query?: QueryParams): Observable<string> {
+        let config: AxiosRequestConfig = {
+            method: 'GET',
+            url: endpoint,
+            params: query,
+            data: {}
+        };
+        
+        this.customizeRequestConfig(config);
+
+        config['responseType'] = 'arraybuffer';
+
+        return singleton<string>((done, reject) => {
+            this.client.request(config)
+                    .then(response => {
+                        var data = Buffer.from(response.data, 'binary').toString('base64');
+                        data = `data:${response.headers['Content-Type']};base64,` + data;
+                        done(data);
+                    })
+                    .catch(reject);
+        }).pipe(
+            catchError(error => this.handleError(error))
+        )
+    }
+
     private communicate<T>(method: HttpMethod, endpoint: string, data?: JsonData | JsonData[] | QueryParams | FormData): Observable<T> {
 
         let config: AxiosRequestConfig = {
@@ -106,17 +131,10 @@ export default class HttpCommunicator {
             config['data'] = data || {};
         }
 
-        if (this.requestOptionsProvider) {
-            let options = this.requestOptionsProvider();
-
-            if (options.headers) {
-                config['headers'] = cloneWith(config['headers'] || {}, options.headers);
-            }
-
-            if (data instanceof FormData) {
-                config['headers'] = config['headers'] || {};
-                config['headers']['Content-Type'] = 'multipart/form-data';
-            }
+        this.customizeRequestConfig(config);
+        
+        if (data instanceof FormData) {
+            config['headers'] = {...config['headers'], 'Content-Type': 'multipart/form-data'}
         }
         
         return singleton<T>((done, reject) => {
@@ -126,6 +144,16 @@ export default class HttpCommunicator {
         }).pipe(
             catchError(error => this.handleError(error))
         )
+    }
+
+    private customizeRequestConfig(config: AxiosRequestConfig) {
+        if (this.requestOptionsProvider) {
+            let options = this.requestOptionsProvider();
+
+            if (options.headers) {
+                config['headers'] = cloneWith(config['headers'] || {}, options.headers);
+            }
+        }
     }
 
     private handleError(axiosError: AxiosError): Observable<any> { 
