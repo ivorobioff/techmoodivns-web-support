@@ -1,19 +1,18 @@
-import React, {Component, ReactElement, Fragment, FormEvent} from 'react';
-import {Box, Checkbox, FormControl, FormControlLabel, InputLabel, MenuItem, Select, TextField, FormLabel, RadioGroup, Radio} from "@material-ui/core";
-import {clone, cloneExcept, cloneWith, hasField, objectEmpty, readField, tryField} from "../../random/utils";
-import {isBlank} from "../../validation/utils";
+import React, { Component, ReactElement, Fragment, FormEvent } from 'react';
+import { Box, Checkbox, FormControl, FormControlLabel, InputLabel, MenuItem, Select, TextField, FormLabel, RadioGroup, Radio, Button } from "@material-ui/core";
+import { clone, cloneExcept, cloneWith, hasField, objectEmpty, readField, tryField } from "../../random/utils";
+import { isBlank } from "../../validation/utils";
 import FormHelperText from '@material-ui/core/FormHelperText';
 import { Autocomplete } from '@material-ui/lab';
 import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
 import MomentUtils from '@date-io/moment';
-
-export type DataFormResult = {[field: string]: any};
-export type DataFormErrors = {[field: string]: any};
+export type DataFormResult = { [field: string]: any };
+export type DataFormErrors = { [field: string]: any };
 export type DataFormResultProvider = () => DataFormResult | null;
 export type DataFormInputHandler = (value: any) => void;
 export type DataFormReadyHandler = (provider: DataFormResultProvider) => void;
 export type DataFormValidator = (value: any) => string | null | undefined;
-export type DataFormConverter= (value: any) => any;
+export type DataFormConverter = (value: any) => any;
 export type DataFormTouchHandler = () => void;
 export type DataFormErrorHandler = (valid: boolean) => void;
 export type DataFormValidateHandler = (result: DataFormResult) => DataFormErrors;
@@ -21,7 +20,7 @@ export type DataFormLayoutProvider = (registry: DataFormRendererRegistry) => Rea
 
 export class DataFormRendererRegistry {
 
-    constructor(private renderers: {[name: string]: () => ReactElement}) {
+    constructor(private renderers: { [name: string]: () => ReactElement }) {
 
     }
 
@@ -30,13 +29,13 @@ export class DataFormRendererRegistry {
         if (!this.renderers[name]) {
             return (<Fragment></Fragment>)
         }
-        
+
         return this.renderers[name]();
     }
 }
 
 export class DataFormHook {
-    provider?:  DataFormResultProvider;
+    provider?: DataFormResultProvider;
 }
 
 export interface DataFormControl {
@@ -45,7 +44,7 @@ export interface DataFormControl {
     name: string;
     value?: any;
     disabled?: boolean;
-    values?: {[key: string]: string};
+    values?: { [key: string]: string };
     onInput?: DataFormInputHandler;
     validate?: DataFormValidator;
     required?: boolean | string;
@@ -58,7 +57,7 @@ export interface DataFormControl {
 
 export interface DataFormCommonProps {
     className?: string;
-    errors?: {[field: string]: string};
+    errors?: { [field: string]: string };
 
     /**
      * @deprecated use hook instead
@@ -70,7 +69,7 @@ export interface DataFormCommonProps {
     onTouch?: DataFormTouchHandler;
     onError?: DataFormErrorHandler;
     onValidate?: DataFormValidateHandler;
-    autoComplete?: 'on'|'off';
+    autoComplete?: 'on' | 'off';
     fresh?: boolean;
     value?: DataFormResult;
 }
@@ -81,8 +80,8 @@ export interface DataFormProps extends DataFormCommonProps {
     layout?: DataFormLayoutProvider;
 }
 
-type DataFormInput = { value: any, error?: string | null | undefined};
-type DataFormInputs = {[field: string]: DataFormInput}
+type DataFormInput = { value: any, error?: string | null | undefined };
+type DataFormInputs = { [field: string]: DataFormInput }
 
 interface DataFormState {
     inputs: DataFormInputs;
@@ -94,7 +93,7 @@ export type DataFormControlRenderer = (
     context: DataFormRenderContext) => ReactElement;
 
 interface DataFormRenderContext {
-    onChange:(value: any) => void;
+    onChange: (value: any) => void;
     state: DataFormState;
 }
 
@@ -130,7 +129,7 @@ function createResult(controls: DataFormControl[], inputs: DataFormInputs): Data
             let input = inputs[control.name];
 
             if (typeof input === 'undefined') {
-                result[control.name] = convertOut(control,  { value: convertIn(control, control.value) });
+                result[control.name] = convertOut(control, { value: convertIn(control, control.value) });
             } else {
                 result[control.name] = convertOut(control, input);
             }
@@ -167,7 +166,7 @@ function resolveError(control: DataFormControl, context: DataFormRenderContext):
     return tryField(context, `state.inputs.${control.name}.error`, undefined);
 }
 
-function hashToOptions(hash: {[name: string]: string }): {value: string, title: string}[] {
+function hashToOptions(hash: { [name: string]: string }): { value: string, title: string }[] {
     return Object.keys(hash).map(key => ({ value: key, title: hash[key] }));
 }
 
@@ -181,21 +180,21 @@ function renderText(control: DataFormControl, context: DataFormRenderContext): R
     }
 
     return (<TextField autoComplete="off" name={control.name}
-                       variant={tryField(control, 'extra.variant', 'standard')}
-                       type={tryField(control, 'extra.type', 'input')}
-                       multiline={tryField(control, 'extra.multiline', false)}
-                       error={!!error}
-                       label={control.label}
-                       onChange={e => context.onChange(e.target.value)}
-                       value={value}
-                       disabled={control.disabled}
-                       helperText={error}
-                       fullWidth />);
+        variant={tryField(control, 'extra.variant', 'standard')}
+        type={tryField(control, 'extra.type', 'input')}
+        multiline={tryField(control, 'extra.multiline', false)}
+        error={!!error}
+        label={control.label}
+        onChange={e => context.onChange(e.target.value)}
+        value={value}
+        disabled={control.disabled}
+        helperText={error}
+        fullWidth />);
 }
 
 function renderSelect(control: DataFormControl, context: DataFormRenderContext): ReactElement {
 
-    const values = readField<{[key: string]: string}>(control, 'values');
+    const values = readField<{ [key: string]: string }>(control, 'values');
 
     const error = resolveError(control, context);
 
@@ -208,10 +207,10 @@ function renderSelect(control: DataFormControl, context: DataFormRenderContext):
     return (<FormControl fullWidth error={!!error}>
         <InputLabel>{control.label}</InputLabel>
         <Select name={control.name}
-                fullWidth
-                onChange={e => context.onChange(e.target.value)}
-                value={value}
-                disabled={control.disabled}>
+            fullWidth
+            onChange={e => context.onChange(e.target.value)}
+            value={value}
+            disabled={control.disabled}>
             {Object.keys(values).map((key, i) => {
                 return (<MenuItem key={i} value={key}>{values[key]}</MenuItem>)
             })}
@@ -225,18 +224,18 @@ function renderAutocomplete(control: DataFormControl, context: DataFormRenderCon
 
     const originalValues = control.values!;
     const availableValues = hashToOptions(originalValues);
-    
+
     const error = resolveError(control, context);
 
     let providedValues = resolveValue(control, context);
 
     if (isMultiple) {
-        providedValues = (providedValues || []).map((value: string) => ({ value, title: originalValues[value]}));
+        providedValues = (providedValues || []).map((value: string) => ({ value, title: originalValues[value] }));
     } else {
-        providedValues = providedValues ? {  value: providedValues, title:  originalValues[providedValues]} : null;
+        providedValues = providedValues ? { value: providedValues, title: originalValues[providedValues] } : null;
     }
 
-    return (<FormControl fullWidth error={!!error}><Autocomplete 
+    return (<FormControl fullWidth error={!!error}><Autocomplete
         disabled={control.disabled}
         multiple={control.extra?.multiple}
         options={availableValues}
@@ -254,35 +253,35 @@ function renderAutocomplete(control: DataFormControl, context: DataFormRenderCon
         getOptionSelected={(option, againstOption) => option.value === againstOption.value}
         filterSelectedOptions
         renderInput={(params) => (
-          <TextField
-            {...params}
-            error={!!error}
-            variant="standard"
-            label={control.label}
-          />
+            <TextField
+                {...params}
+                error={!!error}
+                variant="standard"
+                label={control.label}
+            />
         )} />
         {error && (<FormHelperText>{error}</FormHelperText>)}
-        </FormControl>);
+    </FormControl>);
 }
 
 function renderRadio(control: DataFormControl, context: DataFormRenderContext): ReactElement {
-    
+
     const values = control.values!;
 
     const error = resolveError(control, context);
 
     const value = resolveValue(control, context);
-    
+
     return (<FormControl component="fieldset">
         <FormLabel component="legend">{control.label}</FormLabel>
-        <Box mb={1}/>
-        <RadioGroup name={control.name} 
-                    onChange={e => context.onChange(e.target.value)} >
+        <Box mb={1} />
+        <RadioGroup name={control.name}
+            onChange={e => context.onChange(e.target.value)} >
             {Object.keys(values).map((key, i) => {
-                return (<FormControlLabel key={i} 
-                    value={key} 
-                    control={<Radio checked={value === key} />} 
-                    label={values[key]} 
+                return (<FormControlLabel key={i}
+                    value={key}
+                    control={<Radio checked={value === key} />}
+                    label={values[key]}
                     disabled={control.disabled} />)
             })}
         </RadioGroup>
@@ -304,12 +303,12 @@ function renderCheckbox(control: DataFormControl, context: DataFormRenderContext
     return (
         <FormControl fullWidth error={!!error}>
             <FormControlLabel control={
-            <Checkbox checked={value}
-                      disabled={control.disabled}
-                      onChange={e => context.onChange(e.target.checked)}
-                      name={control.name}
-                      color="primary" />}
-                              label={control.label} />
+                <Checkbox checked={value}
+                    disabled={control.disabled}
+                    onChange={e => context.onChange(e.target.checked)}
+                    name={control.name}
+                    color="primary" />}
+                label={control.label} />
             {error && (<FormHelperText>{error}</FormHelperText>)}
         </FormControl>);
 }
@@ -341,8 +340,42 @@ function renderDate(control: DataFormControl, context: DataFormRenderContext): R
                 context.onChange(e);
             }}
             helperText={error}
-      />
+        />
     </MuiPickersUtilsProvider>);
+}
+
+function renderFile(control: DataFormControl, context: DataFormRenderContext): ReactElement {
+    let error = resolveError(control, context);
+    let value = resolveValue(control, context);
+    let extra = control.extra || { image: false, multiple: false };
+
+    if (typeof value === 'undefined' || value === null) {
+        value = null;
+    }
+
+    return (<FormControl fullWidth error={!!error}>
+        <input
+            accept={extra.image ? 'image/*' : undefined}
+            name={control.name}
+            style={{ 'display': 'none' }}
+            id={'file_' + control.name}
+            multiple={extra.multiple}
+            value={value}
+            type="file"
+            disabled={control.disabled}
+        />
+        <label htmlFor={'file_' + control.name}>
+            <Button
+                variant="outlined"
+                color="primary"
+                component="span"
+                disabled={control.disabled}
+            >
+                Choose
+            </Button>
+        </label>
+        {error && (<FormHelperText>{error}</FormHelperText>)}
+    </FormControl>);
 }
 
 function validate(control: DataFormControl, value: any): string | null | undefined {
@@ -366,7 +399,7 @@ function validate(control: DataFormControl, value: any): string | null | undefin
 }
 
 function uselessForConvert(value: any): boolean {
-    return typeof value === 'undefined' || value === null 
+    return typeof value === 'undefined' || value === null
         || (typeof value === 'string' && value.trim().length === 0);
 }
 
@@ -383,7 +416,7 @@ function convertIn(control: DataFormControl, value: any): any {
     return value;
 }
 
-function convertOut(control: DataFormControl, {value, error}: DataFormInput): any {
+function convertOut(control: DataFormControl, { value, error }: DataFormInput): any {
 
     if (error) {
         return value;
@@ -400,7 +433,7 @@ function convertOut(control: DataFormControl, {value, error}: DataFormInput): an
     return value;
 }
 
-function assignErrors(errors: {[name: string]: string}, inputs: DataFormInputs) {
+function assignErrors(errors: { [name: string]: string }, inputs: DataFormInputs) {
     Object.keys(errors).forEach(field => {
         let error = errors[field];
 
@@ -441,13 +474,14 @@ function cloneControlsWithFormValues(controls: DataFormControl[], formValues: Da
 
 class DataForm extends Component<DataFormProps, DataFormState> {
 
-    private renderers: {[name: string]: DataFormControlRenderer} = {
+    private renderers: { [name: string]: DataFormControlRenderer } = {
         'text': renderText,
         'select': renderSelect,
         'autocomplete': renderAutocomplete,
         'checkbox': renderCheckbox,
         'radio': renderRadio,
-        'date': renderDate
+        'date': renderDate,
+        'file': renderFile
     };
 
     private scheduledTasks: ((controls: DataFormControl[]) => void)[] = [];
@@ -474,7 +508,7 @@ class DataForm extends Component<DataFormProps, DataFormState> {
             this.props.hook.provider = this.prepareResult.bind(this);
         }
     }
-    
+
     prepareResult() {
         let errors = validateAll(this.state.controls, this.state.inputs);
 
@@ -530,7 +564,7 @@ class DataForm extends Component<DataFormProps, DataFormState> {
 
             let errors: DataFormErrors = {};
             let possibleErrors = this.props.errors || {}
-    
+
             newControls.forEach(control => {
                 if (possibleErrors[control.name] && !disabledControls.includes(control.name)) {
                     errors[control.name] = possibleErrors[control.name];
@@ -596,7 +630,7 @@ class DataForm extends Component<DataFormProps, DataFormState> {
             unwrap
         } = this.props;
 
-        const { 
+        const {
             controls
         } = this.state;
 
@@ -607,15 +641,15 @@ class DataForm extends Component<DataFormProps, DataFormState> {
                 return (<Fragment>
                     {controls.map((control, i) => {
                         return (<Fragment key={i}>
-                            { registry.render(control.name) }
-                            { i < controls.length - 1 ? ( <Box m={2} />) : '' }
+                            {registry.render(control.name)}
+                            {i < controls.length - 1 ? (<Box m={2} />) : ''}
                         </Fragment>);
                     })}
                 </Fragment>);
             }
         }
 
-        const renderers: {[name: string]: () => ReactElement} = {};
+        const renderers: { [name: string]: () => ReactElement } = {};
 
         controls.forEach(control => {
             renderers[control.name] = () => {
@@ -632,17 +666,17 @@ class DataForm extends Component<DataFormProps, DataFormState> {
                 {children}
             </Fragment>)
         }
-        
+
         return (<form noValidate onSubmit={this.defaultFormSubmit.bind(this)} autoComplete={autoComplete} className={className}>
             {layout(registry)}
             {children}
         </form>);
     }
-    
+
     defaultFormSubmit(e: FormEvent) {
         e.preventDefault();
     }
-    
+
     private createRenderContext(control: DataFormControl): DataFormRenderContext {
         return {
             onChange: value => {
