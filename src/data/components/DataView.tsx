@@ -231,7 +231,7 @@ class DataView extends Component<DataViewProps, DataViewState> {
         super(props);
 
         this.state = {
-            data: [],
+            data: props.data,
             canGoBack: false,
             canGoForward: false,
             filtered: {},
