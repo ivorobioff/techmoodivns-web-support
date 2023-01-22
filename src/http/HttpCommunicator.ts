@@ -76,15 +76,15 @@ export default class HttpCommunicator {
         return this.communicate('GET', endpoint, query);
     }
 
-    post<T>(endpoint: string, data?: JsonData): Observable<T> {
+    post<T>(endpoint: string, data?: JsonData | FormData): Observable<T> {
         return this.communicate('POST', endpoint, data);
     }
 
-    patch<T>(endpoint: string, updates?: JsonData): Observable<T> {
+    patch<T>(endpoint: string, updates?: JsonData | FormData): Observable<T> {
         return this.communicate('PATCH', endpoint, updates);
     }
 
-    put<T>(endpoint: string, replacement?: JsonData): Observable<T> {
+    put<T>(endpoint: string, replacement?: JsonData | FormData): Observable<T> {
         return this.communicate('PUT', endpoint, replacement);
     }
 
@@ -92,7 +92,7 @@ export default class HttpCommunicator {
         return this.communicate('DELETE', endpoint, query); 
     }
 
-    private communicate<T>(method: HttpMethod, endpoint: string, data?: JsonData | JsonData[] | QueryParams): Observable<T> {
+    private communicate<T>(method: HttpMethod, endpoint: string, data?: JsonData | JsonData[] | QueryParams | FormData): Observable<T> {
 
         let config: AxiosRequestConfig = {
             method,
@@ -111,6 +111,11 @@ export default class HttpCommunicator {
 
             if (options.headers) {
                 config['headers'] = cloneWith(config['headers'] || {}, options.headers);
+            }
+
+            if (data instanceof FormData) {
+                config['headers'] = config['headers'] || {};
+                config['headers']['Content-Type'] = 'multipart/form-data';
             }
         }
         
