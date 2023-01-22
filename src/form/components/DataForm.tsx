@@ -1,5 +1,5 @@
 import React, { Component, ReactElement, Fragment, FormEvent } from 'react';
-import { Box, Checkbox, FormControl, FormControlLabel, InputLabel, MenuItem, Select, TextField, FormLabel, RadioGroup, Radio, Button } from "@material-ui/core";
+import { Box, Checkbox, FormControl, FormControlLabel, InputLabel, MenuItem, Select, TextField, FormLabel, RadioGroup, Radio, Button, Paper } from "@material-ui/core";
 import { clone, cloneExcept, cloneWith, hasField, objectEmpty, readField, tryField } from "../../random/utils";
 import { isBlank } from "../../validation/utils";
 import FormHelperText from '@material-ui/core/FormHelperText';
@@ -358,29 +358,34 @@ function renderFile(control: DataFormControl, context: DataFormRenderContext): R
 
     var reset = () => context.onChange(null);
 
-    return (<FormControl error={!!error}>
-        <input
-            accept={extra.image ? 'image/*' : undefined}
-            style={{ 'display': 'none' }}
-            id={control.name + '_id'}
-            name="image"
-            type="file"
-            disabled={control.disabled}
-            onChange={e => context.onChange(e.target.files ? e.target.files[0] : null)}
-        />
-        <Box display="flex" justifyContent="flex-start" alignItems="center">
-            <label htmlFor={control.name + '_id'}>
-                <Button
-                    variant="outlined"
-                    color="primary"
-                    component="span"
-                    disabled={control.disabled}
-                >{control.label}</Button>
-            </label>
-            {value && <Box paddingLeft={1}><span>{value.name}</span><IconButton onClick={reset} color="secondary" size="small"><MdClose /></IconButton ></Box>}
-        </Box>
-        {error && (<FormHelperText>{error}</FormHelperText>)}
-    </FormControl>);
+    return (
+        <Paper variant="outlined">
+            <Box margin={2}>
+                <FormControl error={!!error}>
+                    <input
+                        accept={extra.image ? 'image/*' : undefined}
+                        style={{ 'display': 'none' }}
+                        id={control.name + '_id'}
+                        name="image"
+                        type="file"
+                        disabled={control.disabled}
+                        onChange={e => context.onChange(e.target.files ? e.target.files[0] : null)}
+                    />
+                    <Box display="flex" justifyContent="flex-start" alignItems="center">
+                        <label htmlFor={control.name + '_id'}>
+                            <Button
+                                variant="outlined"
+                                color="primary"
+                                component="span"
+                                disabled={control.disabled}
+                            >{control.label}</Button>
+                        </label>
+                        {value && <Box paddingLeft={1}><span>{value.name}</span><IconButton onClick={reset} color="secondary" size="small"><MdClose /></IconButton ></Box>}
+                    </Box>
+                    {error && (<Box marginBottom={-1.5} marginLeft={0.2}><FormHelperText>{error}</FormHelperText></Box>)}
+                </FormControl>
+            </Box>
+        </Paper>);
 }
 
 function validate(control: DataFormControl, value: any): string | null | undefined {
