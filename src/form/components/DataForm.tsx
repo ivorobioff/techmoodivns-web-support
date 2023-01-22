@@ -6,6 +6,9 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import { Autocomplete } from '@material-ui/lab';
 import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
 import MomentUtils from '@date-io/moment';
+import IconButton from '@material-ui/core/IconButton';
+import { MdClose } from 'react-icons/md';
+
 export type DataFormResult = { [field: string]: any };
 export type DataFormErrors = { [field: string]: any };
 export type DataFormResultProvider = () => DataFormResult | null;
@@ -347,33 +350,35 @@ function renderDate(control: DataFormControl, context: DataFormRenderContext): R
 function renderFile(control: DataFormControl, context: DataFormRenderContext): ReactElement {
     let error = resolveError(control, context);
     let value = resolveValue(control, context);
-    let extra = control.extra || { image: false, multiple: false };
+    let extra = control.extra || { image: false };
 
     if (typeof value === 'undefined' || value === null) {
-        value = null;
+        value = '';
     }
 
-    return (<FormControl fullWidth error={!!error}>
+    var reset = () => context.onChange(null);
+
+    return (<FormControl error={!!error}>
         <input
             accept={extra.image ? 'image/*' : undefined}
-            name={control.name}
             style={{ 'display': 'none' }}
-            id={'file_' + control.name}
-            multiple={extra.multiple}
-            value={value}
+            id={control.name + '_id'}
+            name="image"
             type="file"
             disabled={control.disabled}
+            onChange={e => context.onChange(e.target.files ? e.target.files[0] : null)}
         />
-        <label htmlFor={'file_' + control.name}>
-            <Button
-                variant="outlined"
-                color="primary"
-                component="span"
-                disabled={control.disabled}
-            >
-                Choose
-            </Button>
-        </label>
+        <Box display="flex" justifyContent="flex-start" alignItems="center">
+            <label htmlFor={control.name + '_id'}>
+                <Button
+                    variant="outlined"
+                    color="primary"
+                    component="span"
+                    disabled={control.disabled}
+                >{control.label}</Button>
+            </label>
+            {value && <Box paddingLeft={1}><span>{value.name}</span><IconButton onClick={reset} color="secondary" size="small"><MdClose /></IconButton ></Box>}
+        </Box>
         {error && (<FormHelperText>{error}</FormHelperText>)}
     </FormControl>);
 }
