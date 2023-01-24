@@ -1,4 +1,4 @@
-export { default as DataForm, DataFormHook } from "./components/DataForm";
+export { default as DataForm, DataFormHook, DataFormRendererRegistry } from "./components/DataForm";
 export { default as DataFormComposite, DataFormCompositeHook } from "./components/DataFormComposite";
 export { default as DataFormHandler } from "./components/DataFormHandler";
 export type {
